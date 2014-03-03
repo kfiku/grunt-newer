@@ -41,6 +41,26 @@ function createTask(grunt) {
       cache: path.join(__dirname, '..', '.cache')
     });
 
+    if(options[taskName]) {
+      /**
+       * merging options with 'taskName' taks options
+       * Exampe:
+       * options: {
+       *   cache: 'app/cache/grunt',
+       *   grunticon: {
+       *     changeConfig: false
+       *   }
+       * }
+       * in 'never:grunticon' will be:
+       * options: {
+       *   cache: 'app/cache/grunt',
+       *   changeConfig: false
+       * }
+       */
+      options = grunt.util._.extend(options, options[taskName]);
+      delete options[taskName];
+    }
+
     // support deprecated timestamps option
     if (options.timestamps) {
       grunt.log.warn('DEPRECATED OPTION.  Use the "cache" option instead');
@@ -96,11 +116,13 @@ function createTask(grunt) {
         });
       }
 
-      // configure target with only newer files
-      config.files = newerFiles;
-      delete config.src;
-      delete config.dest;
-      grunt.config.set([taskName, targetName], config);
+      if(options.changeConfig !== false) {
+        // configure target with only newer files
+        config.files = newerFiles;
+        delete config.src;
+        delete config.dest;
+        grunt.config.set([taskName, targetName], config);
+      }
 
       // because we modified the task config, cache the original
       var id = cacheConfig(originalConfig);
