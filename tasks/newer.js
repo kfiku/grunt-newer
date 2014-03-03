@@ -40,6 +40,27 @@ function createTask(grunt) {
     var options = this.options({
       cache: path.join(__dirname, '..', '.cache')
     });
+    
+    if(options[taskName]) {
+      /**
+       * merging options with 'taskName' taks options
+       * Exampe:
+       * options: {
+       *   cache: 'app/cache/grunt',
+       *   grunticon: {
+       *     changeConfig: false
+       *   }
+       * }
+       * in 'never:grunticon' will be:
+       * options: {
+       *   cache: 'app/cache/grunt',
+       *   changeConfig: false
+       * }
+       */
+      options = grunt.util._.extend(options, options[taskName]);
+      delete options[taskName];
+      console.log(options);
+    }
 
     // support deprecated timestamps option
     if (options.timestamps) {
@@ -96,11 +117,13 @@ function createTask(grunt) {
         });
       }
 
-      // configure target with only newer files
-      config.files = newerFiles;
-      delete config.src;
-      delete config.dest;
-      grunt.config.set([taskName, targetName], config);
+      if(options.changeConfig !== false) {
+        // configure target with only newer files
+        config.files = newerFiles;
+        delete config.src;
+        delete config.dest;
+        grunt.config.set([taskName, targetName], config);
+      }
 
       // because we modified the task config, cache the original
       var id = cacheConfig(originalConfig);
@@ -126,6 +149,12 @@ module.exports = function(grunt) {
   grunt.registerTask(
       'newer', 'Run a task with only those source files that have been ' +
       'modified since the last successful run.', createTask(grunt));
+      
+  grunt.registerTask(
+      'newer-simple', 'Run a task when any source files have been modified ' +
+      'since the last successful run with original config.', createTask(grunt,
+        {simpleMode: true}
+      ));
 
   var deprecated = 'DEPRECATED TASK.  Use the "newer" task instead';
   grunt.registerTask(
