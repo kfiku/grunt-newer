@@ -148,12 +148,6 @@ module.exports = function(grunt) {
   grunt.registerTask(
       'newer', 'Run a task with only those source files that have been ' +
       'modified since the last successful run.', createTask(grunt));
-      
-  grunt.registerTask(
-      'newer-simple', 'Run a task when any source files have been modified ' +
-      'since the last successful run with original config.', createTask(grunt,
-        {simpleMode: true}
-      ));
 
   var deprecated = 'DEPRECATED TASK.  Use the "newer" task instead';
   grunt.registerTask(
