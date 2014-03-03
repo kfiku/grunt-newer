@@ -59,7 +59,6 @@ function createTask(grunt) {
        */
       options = grunt.util._.extend(options, options[taskName]);
       delete options[taskName];
-      console.log(options);
     }
 
     // support deprecated timestamps option
